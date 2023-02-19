@@ -1,0 +1,463 @@
+#include<iostream>
+#include<string>
+#include<fstream>
+#include<iomanip>
+
+using namespace std;
+
+class Vehicle
+{
+protected:
+    double base_price;//vehicle attributes
+    string vin,brand,type;
+    int year;
+
+public:
+
+    virtual void calculate()=0;
+
+    ~Vehicle()
+    {
+    }
+};
+
+//End of vehicle class
+
+class finance
+{
+protected:
+    double m_rental,t_amount_toPay,interest_amount,interest_rate,installments;
+    int switch_case;//switch case
+
+public:
+
+    void option_select();
+
+    virtual void finance_calculate()=0;
+
+    ~finance()
+    {
+    }
+};
+void finance::option_select()
+{
+    do
+    {
+        cout<<"\nChose Plan from below"<<endl;
+        cout<<"1. 5 Year Plan (Interest Rate is 11% to 60 installments)"<<endl;
+        cout<<"2. 3 Year Plan (Interest Rate is 10.25% to 36 installments)"<<endl;
+        cout<<"3. 2 Year Plan (Interest Rate is 8.75% to 24 installments)"<<endl;
+        cin>>switch_case;
+
+        switch(switch_case)
+        {
+        case 1:
+            interest_rate=11;
+            installments=60;
+            break;
+        case 2:
+            interest_rate=10.25;
+            installments=36;
+            break;
+        case 3:
+            interest_rate=8.75;
+            installments=24;
+            break;
+        default:
+            cout<<"Wrong Input"<<endl<<endl;
+            break;
+        }
+
+    }while(!(switch_case==1||switch_case==2||switch_case==3));
+}
+//End of finance class
+
+class Light_Vehicle:public Vehicle,public finance
+{
+protected:
+    double down_p;
+public:
+    Light_Vehicle();
+    void setData();
+    void writeDataToFile();
+    void calculate();
+    void finance_calculate();
+    void displayData();
+    ~Light_Vehicle()
+    {
+    }
+};
+Light_Vehicle::Light_Vehicle()
+{
+    cout<<"\t\t*******************************************************************"<<endl;
+    cout<<"\t\t\t\tAbout Light Vehicle Facilities"<<endl;
+    cout<<"\t\t\t\tDown Payment is 30% of Price"<<endl;
+    cout<<"\t\t\t\tCustomer can lease up to 70%"<<endl;
+    cout<<"\t\t*******************************************************************"<<endl;
+}
+
+void Light_Vehicle::setData()
+{
+    cout<<"Enter Base Price\t"; cin>>base_price;
+    cout<<"Enter Vehicle ID\t"; cin>>vin;
+    cout<<"Enter YOM\t\t"; cin>>year;
+    cout<<"Enter Brand\t\t"; cin>>brand;
+    cout<<"Enter model\t\t"; cin>>type;
+}
+
+void Light_Vehicle::calculate()
+{
+    down_p=base_price*30/100;
+}
+
+void Light_Vehicle::writeDataToFile()
+{
+    ofstream Light_File;
+
+    Light_File.open("‪F:\CW2\light.txt",ios::app);
+    Light_File.seekp(10,ios::beg);
+    Light_File<<base_price<<setw(40)<<down_p<<setw(40)<<vin<<setw(40)<<year<<setw(40)<<brand<<setw(40)<<type<<endl;
+
+    Light_File.close();
+}
+
+void Light_Vehicle::displayData()
+{
+    double dp_l,price_l;
+    string id_l,bnd_l,typ_l;
+    int yom_l;
+
+    ifstream Light_fileRead;
+    cout<<endl<<"Light Vehicles"<<endl;
+    cout<<"Vehicle ID\tBrand\t\t\tModel/Year\t\t\tPrice\t\t\tDown Payment"<<endl;
+    cout<<"-------------------------------------------------------------------";
+    cout<<"----------------------------------------------"<<endl;
+
+    Light_fileRead.open("‪F:\CW2\light.txt",ios::in);
+    while(Light_fileRead)
+    {
+        Light_fileRead>>price_l>>dp_l>>id_l>>yom_l>>bnd_l>>typ_l;
+        if(Light_fileRead.eof())
+        {
+            break;
+        }
+        cout<<id_l;
+
+        cout<<"\t\t"<<bnd_l<<"\t\t\t"<<typ_l<<" "<<yom_l<<"\t\t\t"<<price_l/1000000<<" M";
+
+        if(dp_l>1000000)
+        {
+            cout<<"\t\t\t"<<dp_l/1000000<<" M"<<endl;
+        }else
+        {
+            cout<<"\t\t\t"<<dp_l<<endl;
+        }
+    }
+    Light_fileRead.close();
+}
+
+void Light_Vehicle::finance_calculate()
+{
+    double dp_l,price_l;
+    string id_l,bnd_l,typ_l,vin_f_cal;
+    int yom_l;
+    cout<<"Enter Vehicle ID to calculate\t"; cin>>vin_f_cal;
+
+    ifstream finance_cal;
+
+    cout<<"Finance Table"<<endl;
+
+    finance_cal.open("‪F:\CW2\light.txt",ios::in);
+    while(finance_cal)
+    {
+        finance_cal>>price_l>>dp_l>>id_l>>yom_l>>bnd_l>>typ_l;
+        if(vin_f_cal==id_l)
+        {
+            t_amount_toPay=price_l-dp_l;
+            interest_amount=t_amount_toPay*interest_rate/100;
+            m_rental=(t_amount_toPay+interest_amount)/installments;
+
+            cout<<"\n***************************************"<<endl;
+            cout<<"Finance for\t"<<bnd_l<<" "<<typ_l<<endl;
+            cout<<"Vehicle ID\t"<<id_l<<endl;
+            cout<<"***************************************"<<endl<<endl;
+            cout<<"Interest Rate\t\t"<<interest_rate<<endl<<endl;
+            cout<<"Installments\t\t"<<installments<<endl;
+            cout<<"Total amount to Pay\t"<<t_amount_toPay/1000000<<" Millions"<<endl;
+            cout<<"Monthly Rental\t\t"<<m_rental<<endl;
+            cout<<"Interest Amount\t\t"<<interest_amount/1000000<<" Millions"<<endl;
+            cout<<"***************************************"<<endl<<endl;
+
+            break;
+        }
+    }
+}
+
+//End of Light Vehicle Class...........................................................................................
+
+class Heavy_Vehicle:public Vehicle,public finance
+{
+protected:
+    double down_p_h;
+public:
+    Heavy_Vehicle();
+    void setData();
+    void writeDataToFile();
+    void calculate();
+    void finance_calculate();
+    void displayData();
+    ~Heavy_Vehicle()
+    {
+    }
+};
+Heavy_Vehicle::Heavy_Vehicle()
+{
+    cout<<"\t\t\t\tAbout Light Vehicle Facilities"<<endl;
+    cout<<"\t\t\t\tDown Payment is 10% of Price"<<endl;
+    cout<<"\t\t\t\tCustomer can lease up to 90%"<<endl;
+    cout<<"\t\t*******************************************************************"<<endl<<endl;
+}
+
+void Heavy_Vehicle::setData()
+{
+    cout<<"Enter Base Price\t"; cin>>base_price;
+    cout<<"Enter Vehicle ID\t"; cin>>vin;
+    cout<<"Enter YOM\t\t"; cin>>year;
+    cout<<"Enter Brand\t\t"; cin>>brand;
+    cout<<"Enter model\t\t"; cin>>type;
+}
+
+void Heavy_Vehicle::calculate()
+{
+    down_p_h=base_price*10/100;
+}
+
+void Heavy_Vehicle::writeDataToFile()
+{
+    ofstream Heavy_File;
+
+    Heavy_File.open("‪F:\CW2\heavy.txt",ios::app);
+    Heavy_File<<base_price<<setw(40)<<down_p_h<<setw(40)<<vin<<setw(40)<<year<<setw(40)<<brand<<setw(40)<<type<<endl;
+
+    Heavy_File.close();
+}
+
+void Heavy_Vehicle::displayData()
+{
+    double dp_h,price_h;//this variables used to store data from files
+    string id_h,bnd_h,typ_h;
+    int yom_h;
+
+    ifstream Heavy_fileRead;
+    cout<<endl<<"Heavy Vehicle"<<endl;
+    cout<<"Vehicle ID\tBrand\t\t\tModel/Year\t\t\tPrice\t\t\tDown Payment"<<endl;
+    cout<<"-------------------------------------------------------------------";
+    cout<<"----------------------------------------------"<<endl;
+
+    Heavy_fileRead.open("‪F:\CW2\heavy.txt",ios::in);
+    while(Heavy_fileRead)
+    {
+        Heavy_fileRead>>price_h>>dp_h>>id_h>>yom_h>>bnd_h>>typ_h;
+        if(Heavy_fileRead.eof())
+        {
+            break;
+        }
+        cout<<id_h;
+
+        cout<<"\t\t"<<bnd_h<<"\t\t\t"<<typ_h<<" "<<yom_h<<"\t\t\t"<<price_h/1000000<<" M";
+
+        if(dp_h>1000000)
+        {
+            cout<<"\t\t\t"<<dp_h/1000000<<" M"<<endl;
+        }else
+        {
+            cout<<"\t\t\t"<<dp_h<<endl;
+        }
+    }
+    Heavy_fileRead.close();
+}
+
+void Heavy_Vehicle::finance_calculate()
+{
+    double dp_h,price_h;
+    string id_h,bnd_h,typ_h,vin_f_cal;
+    int yom_h;
+    cout<<"Enter Vehicle ID to calculate\t"; cin>>vin_f_cal;
+
+    ifstream finance_cal;
+
+    finance_cal.open("‪F:\CW2\heavy.txt",ios::in);
+    while(finance_cal)
+    {
+        finance_cal>>price_h>>dp_h>>id_h>>yom_h>>bnd_h>>typ_h;
+        if(vin_f_cal==id_h)
+        {
+            t_amount_toPay=price_h-dp_h;
+            interest_amount=t_amount_toPay*interest_rate/100;
+            m_rental=(t_amount_toPay+interest_amount)/installments;
+
+            cout<<"\n***************************************"<<endl;
+            cout<<"Finance for\t"<<bnd_h<<" "<<typ_h<<endl;
+            cout<<"Vehicle ID\t"<<id_h<<endl;
+            cout<<"***************************************"<<endl<<endl;
+            cout<<"Interest Rate\t\t"<<interest_rate<<endl<<endl;
+            cout<<"Installments\t\t"<<installments<<endl;
+            cout<<"Total amount to Pay\t"<<t_amount_toPay/1000000<<" Millions"<<endl;
+            cout<<"Monthly Rental\t\t"<<m_rental<<endl;
+            cout<<"Interest Amount\t\t"<<interest_amount/1000000<<" Millions"<<endl;
+            cout<<"***************************************"<<endl<<endl;
+            break;
+        }
+    }
+}
+//End of Heavy Vehicle class...............................................................................................
+
+//main menu................................................................................................................
+int main_menu()
+{
+    int menu_s1,menu_s2;
+
+    cout<<"\t\t*******************************************************************\n"<<endl;
+    cout<<"\t\t\t\tHello Welcome To Finance Calculator"<<endl;
+    cout<<"\t\t*******************************************************************\n"<<endl;
+
+    Vehicle *a,*b;
+
+    Light_Vehicle car;
+    Heavy_Vehicle bus;
+
+    a=&car;
+    b=&bus;
+
+
+    do
+    {
+        main_menu:
+
+        cout<<"\n\t*****Main Menu*****"<<endl;
+        cout<<"\nChose one Option From Below (Numbers Only)"<<endl;
+        cout<<"1. Add new Vehicle"<<endl;
+        cout<<"2. Show All Vehicles"<<endl;
+        cout<<"3. Open Finance Calculator"<<endl;
+        cout<<"4. Exit"<<endl;
+        cin>>menu_s1;
+
+        switch(menu_s1)
+        {
+        case 1://add vehicle
+            do
+            {
+                cout<<"\t*****Vehicle adding Menu*****\n\nSelect One option"<<endl;
+                cout<<"1. Light Vehicle"<<endl;
+                cout<<"2. Heavy Vehicle"<<endl;
+                cout<<"3. Go Back To Main Menu"<<endl;
+                cin>>menu_s2;
+
+                switch(menu_s2)
+                {
+                case 1:
+                    car.setData();
+                    a->calculate();
+                    car.writeDataToFile();
+                    cout<<"\nDone...........!"<<endl;
+                    goto main_menu;
+                    break;
+
+                case 2:
+                    bus.setData();
+                    b->calculate();
+                    bus.writeDataToFile();
+                    cout<<"\nDone...........!"<<endl;
+                    goto main_menu;
+                    break;
+
+                case 3:
+                    goto main_menu;
+                    break;
+                default:
+                    cout<<"Wrong Input"<<endl<<endl;
+                    break;
+                }
+            }while(!(menu_s2==3));
+            break;
+            //End of Case 1
+
+
+
+        case 2://show all vehicle
+            {
+                car.displayData();
+                bus.displayData();
+                break;
+            }
+            //end of case 2
+
+
+
+        case 3://finance calculator
+            {
+                do
+                {
+                    start_case3:
+
+                    cout<<"\t*****Finance Calculator*****\n\nSelect One option"<<endl;
+                    cout<<"1. Light Vehicle"<<endl;
+                    cout<<"2. Heavy Vehicle"<<endl;
+                    cout<<"3. Go Back To Main Menu"<<endl;
+                    cin>>menu_s2;
+
+                    switch(menu_s2)
+                    {
+                    case 1:
+                        finance *x;
+                        car.option_select();
+                        car.displayData();
+                        x=&car;
+                        x->finance_calculate();
+                        goto start_case3;
+                        break;
+
+                    case 2:
+                        finance *y;
+                        bus.option_select();
+                        bus.displayData();
+                        y=&bus;
+                        y->finance_calculate();
+                        goto start_case3;
+                        break;
+
+                    case 3:
+                        goto main_menu;
+                        break;
+
+                    default:
+                        cout<<"Wrong Input"<<endl<<endl;
+                        break;
+                    }
+            }while(!(menu_s2==3));
+            break;
+            //End of case 3
+        }
+
+        case 4://exit
+            break;
+
+        default:
+            cout<<"wrong Input"<<endl;
+            break;
+
+        }
+    }while(!(menu_s1==4));
+
+    return 0;
+}
+
+
+//main function..............................................................
+int main()
+{
+    main_menu();
+
+    return 0;
+}
+
